@@ -1,12 +1,24 @@
 function polinomio = newton(x, y)
-  n = length(x);
-  if (n == 1)
-    polinomio = @(x)(y(1));
-  else
-    x_corto = x(1:(n-1));
-    y_corto = y(1:(n-1))
-    pn_1 = newton(x_corto, y_corto);
-
-    polinomio = @(t)(pn_1(t) + (y(n) - pn_1(x(n)))*prod(t-x_corto)/prod(x(n)-x_corto))
-  endif
-endfunction
+    n = length(x);
+  
+    tabla = zeros(n,n);
+    tabla(:, 1) = y;
+    for j = 2:n
+      for i = 1:n-j+1
+        numerador = tabla(i+1,j-1) - tabla(i,j-1);
+        denominador = x(i+j-1) - x(i);
+        tabla(i,j) = numerador / denominador;
+      endfor
+    endfor
+  
+    a = tabla(1, :);
+    polinomio = @(abscisa)(horner(abscisa,a,x));
+  endfunction
+  
+  function evaluacion = horner(abscisa, coeficientes, nodos)
+      n = length(coeficientes);
+      evaluacion = coeficientes(n);
+      for i = (n - 1):-1:1 % for decreciente.
+          evaluacion = evaluacion .* (abscisa - nodos(i)) + coeficientes(i);
+      end
+  end
